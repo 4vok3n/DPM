@@ -1,0 +1,21 @@
+// This file has been replaced by a modular structure
+// The original monolithic code has been split into ES6 modules:
+//
+// js/main.js - Main application entry point
+// js/data.js - Data management and localStorage operations
+// js/navigation.js - Navigation handling between views
+// js/forms.js - Form handling and validation
+// js/reports.js - Report generation (monthly/yearly)
+// js/exportImport.js - Export/import functionality
+// js/ui.js - UI utilities and helper functions
+//
+// The HTML now uses: <script type="module" src="js/main.js"></script>
+//
+// This modular approach provides:
+// - Better code organization
+// - Improved maintainability
+// - Easier testing and debugging
+// - Modern JavaScript best practices
+// - Preserved functionality
+
+console.warn('This monolithic app.js file has been replaced by modular ES6 modules. Please use the new modular structure in the js/ directory.');
