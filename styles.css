@@ -271,6 +271,31 @@ table tbody tr:nth-child(even) {
     color: white;
 }
 
+/* Power input fields styling */
+.power-input {
+    width: 80px;
+    padding: 4px;
+    text-align: right;
+}
+
+/* Usage percentage styling */
+.usage-percent {
+    font-weight: bold;
+    text-align: center;
+}
+
+.low-usage {
+    color: green;
+}
+
+.medium-usage {
+    color: orange;
+}
+
+.high-usage {
+    color: red;
+}
+
 footer {
     text-align: center;
     padding: 1rem;

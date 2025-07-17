@@ -77,8 +77,8 @@
                                 <th>Date</th>
                                 <th>Cabinet/Rack</th>
                                 <th>Circuit</th>
-                                <th colspan="2">Primary Circuit</th>
-                                <th colspan="2">Redundant Circuit</th>
+                                <th colspan="3">Primary Circuit</th>
+                                <th colspan="3">Redundant Circuit</th>
                                 <th>Total Usage (%)</th>
                                 <th>Notes</th>
                                 <th>Actions</th>
@@ -87,10 +87,12 @@
                                 <th></th>
                                 <th></th>
                                 <th></th>
-                                <th>Usage (kW)</th>
-                                <th>Usage (A Avg)</th>
-                                <th>Usage (kW)</th>
-                                <th>Usage (A Avg)</th>
+                                <th>kW</th>
+                                <th>Amps</th>
+                                <th>Volts</th>
+                                <th>kW</th>
+                                <th>Amps</th>
+                                <th>Volts</th>
                                 <th></th>
                                 <th></th>
                                 <th></th>
@@ -211,7 +213,6 @@
         <!-- Export/Import View -->
         <section id="export-view" class="view">
             <h2>Export/Import Data</h2>
-            
             <div class="export-section">
                 <h3>Export Data</h3>
                 <div class="form-group">
@@ -242,13 +243,5 @@
     <footer>
         <p>&copy; 2025 Datacenter Power Readings Manager</p>
     </footer>
-
-    <div id="error-container" style="display:none; background-color:#f8d7da; color:#721c24; padding:15px; margin:10px; border-radius:5px;">
-        <h3>An error occurred</h3>
-        <p id="error-message"></p>
-        <button onclick="this.parentElement.style.display='none'">Close</button>
-    </div>
-
-    <script src="app.js"></script>
 </body>
 </html>
