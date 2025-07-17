@@ -1139,3 +1139,120 @@ class DatacenterPowerApp {
                         }
                         
                         // Save merged data
+                        this.saveData();
+                        
+                        // Update metadata
+                        this.extractMetadata();
+                        
+                        // Update selects
+                        this.populateSelects();
+                        
+                        if (statusDiv) {
+                            statusDiv.innerHTML = 'JSON data imported successfully!';
+                            statusDiv.className = 'success-message';
+                        } else {
+                            alert('JSON data imported successfully!');
+                        }
+                    } else if (file.name.endsWith('.csv')) {
+                        // Import CSV
+                        const csvData = e.target.result;
+                        this.importCSV(csvData);
+                        
+                        if (statusDiv) {
+                            statusDiv.innerHTML = 'CSV data imported successfully!';
+                            statusDiv.className = 'success-message';
+                        } else {
+                            alert('CSV data imported successfully!');
+                        }
+                    } else {
+                        if (statusDiv) {
+                            statusDiv.innerHTML = 'Unsupported file format. Please use JSON or CSV.';
+                            statusDiv.className = 'error-message';
+                        } else {
+                            alert('Unsupported file format. Please use JSON or CSV.');
+                        }
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing file:', parseError);
+                    if (statusDiv) {
+                        statusDiv.innerHTML = 'Error parsing file: ' + parseError.message;
+                        statusDiv.className = 'error-message';
+                    } else {
+                        alert('Error parsing file: ' + parseError.message);
+                    }
+                }
+            };
+            
+            reader.readAsText(file);
+        } catch (error) {
+            console.error('Error importing data:', error);
+            const statusDiv = document.getElementById('import-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = 'Error importing data: ' + error.message;
+                statusDiv.className = 'error-message';
+            } else {
+                showErrorMessage('Error importing data: ' + error.message);
+            }
+        }
+    }
+    
+    importCSV(csvData) {
+        try {
+            const lines = csvData.split('\n');
+            const headers = lines[0].split(',');
+            
+            // Skip header row
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    const values = line.split(',');
+                    
+                    if (values.length >= 10) {
+                        const datacenter = values[0];
+                        const date = values[1];
+                        const supplier = values[2];
+                        const cabinetRack = values[3];
+                        const circuit = values[4];
+                        const primaryKw = parseFloat(values[5]) || 0;
+                        const primaryA = parseFloat(values[6]) || 0;
+                        const redundantKw = parseFloat(values[7]) || 0;
+                        const redundantA = parseFloat(values[8]) || 0;
+                        const notes = values[9] ? values[9].replace(/"/g, '') : '';
+                        
+                        // Create entry
+                        const entry = {
+                            date,
+                            supplier,
+                            cabinetRack,
+                            circuit,
+                            primaryKw,
+                            primaryA,
+                            redundantKw,
+                            redundantA,
+                            notes
+                        };
+                        
+                        // Add to data
+                        if (!this.data[datacenter]) {
+                            this.data[datacenter] = [];
+                        }
+                        
+                        this.data[datacenter].push(entry);
+                    }
+                }
+            }
+            
+            // Save data
+            this.saveData();
+            
+            // Update metadata
+            this.extractMetadata();
+            
+            // Update selects
+            this.populateSelects();
+        } catch (error) {
+            console.error('Error importing CSV:', error);
+            throw error;
+        }
+    }
+}
