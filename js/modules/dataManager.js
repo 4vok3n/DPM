@@ -44,40 +44,44 @@ export class DataManager {
 
     extractMetadata() {
         try {
-            // Clear existing metadata
+            // Extract all unique suppliers, datacenters, cabinets, circuits
+            // and build relationship maps
             this.suppliers.clear();
             this.datacenters.clear();
             this.cabinets.clear();
             this.circuits.clear();
             this.relationshipMap = {};
-            
-            // Extract metadata from data
+
             for (const datacenter in this.data) {
-                if (Object.hasOwnProperty.call(this.data, datacenter)) {
+                if (Object.prototype.hasOwnProperty.call(this.data, datacenter)) {
                     this.datacenters.add(datacenter);
                     
-                    const entries = this.data[datacenter];
-                    entries.forEach(entry => {
-                        if (entry.supplier) {
-                            this.suppliers.add(entry.supplier);
+                    if (Array.isArray(this.data[datacenter])) {
+                        this.data[datacenter].forEach(entry => {
+                            if (entry && entry.supplier) this.suppliers.add(entry.supplier);
+                            if (entry && entry.cabinetRack) this.cabinets.add(entry.cabinetRack);
+                            if (entry && entry.circuit) this.circuits.add(entry.circuit);
                             
-                            if (!this.relationshipMap[entry.supplier]) {
-                                this.relationshipMap[entry.supplier] = {
-                                    datacenters: new Set(),
-                                    cabinets: new Set(),
-                                    circuits: new Set()
-                                };
+                            // Build relationship map
+                            if (entry && entry.supplier) {
+                                if (!this.relationshipMap[entry.supplier]) {
+                                    this.relationshipMap[entry.supplier] = {
+                                        datacenters: new Set(),
+                                        cabinets: new Set(),
+                                        circuits: new Set()
+                                    };
+                                }
+                                
+                                this.relationshipMap[entry.supplier].datacenters.add(datacenter);
+                                if (entry.cabinetRack) {
+                                    this.relationshipMap[entry.supplier].cabinets.add(entry.cabinetRack);
+                                }
+                                if (entry.circuit) {
+                                    this.relationshipMap[entry.supplier].circuits.add(entry.circuit);
+                                }
                             }
-                            
-                            this.relationshipMap[entry.supplier].datacenters.add(datacenter);
-                            if (entry.cabinetRack) {
-                                this.relationshipMap[entry.supplier].cabinets.add(entry.cabinetRack);
-                            }
-                            if (entry.circuit) {
-                                this.relationshipMap[entry.supplier].circuits.add(entry.circuit);
-                            }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         } catch (error) {
@@ -88,101 +92,51 @@ export class DataManager {
     
     // Add methods for data manipulation
     addEntry(datacenter, entry) {
-        try {
-            if (!datacenter) {
-                throw new Error('Datacenter is required');
-            }
-            
-            // Initialize datacenter array if it doesn't exist
-            if (!this.data[datacenter]) {
-                this.data[datacenter] = [];
-            }
-            
-            // Add the entry to the datacenter
-            this.data[datacenter].push(entry);
-            
-            // Update metadata
-            this.datacenters.add(datacenter);
-            if (entry.supplier) {
-                this.suppliers.add(entry.supplier);
-            }
-            if (entry.cabinetRack) {
-                this.cabinets.add(entry.cabinetRack);
-            }
-            if (entry.circuit) {
-                this.circuits.add(entry.circuit);
-            }
-            
-            // Update relationship map
-            if (entry.supplier) {
-                if (!this.relationshipMap[entry.supplier]) {
-                    this.relationshipMap[entry.supplier] = {
-                        datacenters: new Set(),
-                        cabinets: new Set(),
-                        circuits: new Set()
-                    };
-                }
-                
-                this.relationshipMap[entry.supplier].datacenters.add(datacenter);
-                if (entry.cabinetRack) {
-                    this.relationshipMap[entry.supplier].cabinets.add(entry.cabinetRack);
-                }
-                if (entry.circuit) {
-                    this.relationshipMap[entry.supplier].circuits.add(entry.circuit);
-                }
-            }
-            
-            // Save the data
-            this.saveData();
-            
-        } catch (error) {
-            console.error('Error adding entry:', error);
-            showErrorMessage('Failed to add entry: ' + error.message);
-            throw error;
+        if (!this.data[datacenter]) {
+            this.data[datacenter] = [];
         }
+        
+        this.data[datacenter].push(entry);
+        this.extractMetadata(); // Re-extract metadata after adding
+        this.saveData();
     }
     
     // Power conversion utility methods
     calculateKWFromAmpsVolts(amps, volts) {
-        if (!amps || !volts) return null;
+        if (!amps || !volts) return 0;
         // P(kW) = I(A) × V(V) / 1000
         return (amps * volts) / 1000;
     }
     
     calculateAmpsFromKWVolts(kw, volts) {
-        if (!kw || !volts) return null;
+        if (!kw || !volts) return 0;
         // I(A) = P(kW) × 1000 / V(V)
         return (kw * 1000) / volts;
     }
     
     calculateVoltsFromKWAmps(kw, amps) {
-        if (!kw || !amps) return null;
+        if (!kw || !amps) return 0;
         // V(V) = P(kW) × 1000 / I(A)
         return (kw * 1000) / amps;
     }
     
     getDatacenterList() {
-        return Array.from(this.datacenters);
+        return Array.from(this.datacenters).sort();
     }
     
     getSupplierList() {
-        return Array.from(this.suppliers);
+        return Array.from(this.suppliers).sort();
     }
     
     getCabinetList() {
-        return Array.from(this.cabinets);
+        return Array.from(this.cabinets).sort();
     }
     
     getCircuitList() {
-        return Array.from(this.circuits);
+        return Array.from(this.circuits).sort();
     }
     
     getDatacenterData(datacenter) {
-        if (datacenter === 'all') {
-            // Return all data flattened
-            return Object.values(this.data).flat();
-        }
-        
         return this.data[datacenter] || [];
     }
 }

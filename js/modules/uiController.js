@@ -64,6 +64,8 @@ export class UIController {
             const addManualRowBtn = document.getElementById('add-manual-row');
             if (addManualRowBtn) {
                 addManualRowBtn.addEventListener('click', this.addManualRow.bind(this));
+            } else {
+                console.error('Add manual row button not found');
             }
             
             // Set up input field events for power conversions
@@ -82,6 +84,8 @@ export class UIController {
             const generateRowsBtn = document.getElementById('generate-rows');
             if (generateRowsBtn) {
                 generateRowsBtn.addEventListener('click', this.generateRows.bind(this));
+            } else {
+                console.error('Generate rows button not found');
             }
             
             // Set up custom rows input visibility
@@ -245,7 +249,13 @@ export class UIController {
     
     addManualRow() {
         try {
+            console.log('Adding manual row');
             const tbody = document.getElementById('data-rows');
+            if (!tbody) {
+                console.error('data-rows element not found');
+                return;
+            }
+            
             const row = document.createElement('tr');
             
             // Generate a unique ID for the row
@@ -297,6 +307,7 @@ export class UIController {
     
     generateRows() {
         try {
+            console.log('Generating rows');
             const startMonth = document.getElementById('start-month').value;
             const numRowsSelect = document.getElementById('num-rows');
             const customNumRows = document.getElementById('custom-num-rows');
@@ -318,7 +329,12 @@ export class UIController {
             const startDate = new Date(startMonth + '-01');
             
             // Clear existing rows
-            document.getElementById('data-rows').innerHTML = '';
+            const tbody = document.getElementById('data-rows');
+            if (!tbody) {
+                console.error('data-rows element not found');
+                return;
+            }
+            tbody.innerHTML = '';
             
             // Generate rows
             for (let i = 0; i < numRows; i++) {
@@ -330,7 +346,6 @@ export class UIController {
                 const formattedDate = date.toISOString().split('T')[0];
                 
                 // Add a row
-                const tbody = document.getElementById('data-rows');
                 const row = document.createElement('tr');
                 
                 // Generate a unique ID for the row

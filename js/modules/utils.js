@@ -13,6 +13,10 @@ export function showErrorMessage(message) {
     }
 }
 
+export function showSuccessMessage(message) {
+    alert(message); // Simple success message
+}
+
 export function formatDate(date) {
     if (!date) return '';
     

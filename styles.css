@@ -296,6 +296,31 @@ table tbody tr:nth-child(even) {
     color: red;
 }
 
+/* Error container */
+.error-container {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    display: none;
+}
+
+.error-container button {
+    background-color: #721c24;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.error-container button:hover {
+    background-color: #5a171d;
+}
+
 footer {
     text-align: center;
     padding: 1rem;
