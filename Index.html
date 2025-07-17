@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datacenter Power Readings Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Datacenter Power Readings Manager</h1>
+        <nav>
+            <ul>
+                <li><a href="#" class="active" data-view="input">Input Data</a></li>
+                <li><a href="#" data-view="monthly">Monthly Report</a></li>
+                <li><a href="#" data-view="yearly">Yearly Report</a></li>
+                <li><a href="#" data-view="export">Export/Import</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Input View -->
+        <section id="input-view" class="view active">
+            <h2>Input Power Readings</h2>
+            
+            <div class="form-controls">
+                <div class="form-group">
+                    <label for="datacenter-select">Select Datacenter:</label>
+                    <select id="datacenter-select">
+                        <option value="">-- Select Existing or Add New --</option>
+                    </select>
+                    <input type="text" id="new-datacenter" placeholder="Or enter new datacenter name">
+                </div>
+
+                <div class="form-group">
+                    <label for="supplier-select">Select Supplier:</label>
+                    <select id="supplier-select">
+                        <option value="">-- Select Existing or Add New --</option>
+                    </select>
+                    <input type="text" id="new-supplier" placeholder="Or enter new supplier name">
+                </div>
+                
+                <!-- New field for rack count -->
+                <div class="form-group" id="rack-count-container">
+                    <label for="rack-count">Number of Racks/Cabinets:</label>
+                    <input type="number" id="rack-count" min="1" value="1">
+                    <p class="helper-text">For new datacenters only - how many rack rows to generate per month</p>
+                </div>
+            </div>
+            
+            <div class="row-generation">
+                <h3>Generate Multiple Input Rows</h3>
+                <div class="form-group">
+                    <label for="start-month">Starting Month:</label>
+                    <input type="month" id="start-month" required>
+                </div>
+                <div class="form-group">
+                    <label for="num-rows">Number of Months:</label>
+                    <select id="num-rows">
+                        <option value="1">1 month</option>
+                        <option value="6">6 months</option>
+                        <option value="12">12 months</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                    <input type="number" id="custom-num-rows" min="1" max="36" value="1" class="hidden">
+                </div>
+                <button id="generate-rows">Generate Input Rows</button>
+            </div>
+            
+            <form id="power-data-form">
+                <div class="data-table-container">
+                    <table id="data-input-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Cabinet/Rack</th>
+                                <th>Circuit</th>
+                                <th colspan="2">Primary Circuit</th>
+                                <th colspan="2">Redundant Circuit</th>
+                                <th>Total Usage (%)</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>Usage (kW)</th>
+                                <th>Usage (A Avg)</th>
+                                <th>Usage (kW)</th>
+                                <th>Usage (A Avg)</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-rows">
+                            <!-- Data rows will be generated here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- New manual row addition button -->
+                <div class="add-row-container">
+                    <button type="button" id="add-manual-row">+ Add Row Manually</button>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" id="save-data">Save Data</button>
+                    <button type="button" id="clear-form">Clear Form</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Monthly Report View -->
+        <section id="monthly-view" class="view">
+            <h2>Monthly Power Usage Report</h2>
+            
+            <div class="report-controls">
+                <div class="form-group">
+                    <label for="report-datacenter">Datacenter:</label>
+                    <select id="report-datacenter">
+                        <option value="all">All Datacenters</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="report-year-month">Year/Month:</label>
+                    <input type="month" id="report-year-month">
+                </div>
+                <button id="generate-monthly-report">Generate Report</button>
+            </div>
+            
+            <div class="report-container">
+                <div class="report-summary">
+                    <h3>Summary</h3>
+                    <div id="monthly-summary"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <!-- Chart will be replaced with a table summary -->
+                </div>
+                
+                <div class="table-container">
+                    <table id="monthly-data-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Datacenter</th>
+                                <th>Supplier</th>
+                                <th>Cabinet/Rack</th>
+                                <th>Circuit</th>
+                                <th>Usage (kWh)</th>
+                                <th>Primary (kWh)</th>
+                                <th>Redundant (kWh)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthly-data"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Yearly Report View -->
+        <section id="yearly-view" class="view">
+            <h2>Yearly Power Usage Report</h2>
+            
+            <div class="report-controls">
+                <div class="form-group">
+                    <label for="yearly-report-datacenter">Datacenter:</label>
+                    <select id="yearly-report-datacenter">
+                        <option value="all">All Datacenters</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="report-year">Year:</label>
+                    <select id="report-year"></select>
+                </div>
+                <button id="generate-yearly-report">Generate Report</button>
+            </div>
+            
+            <div class="report-container">
+                <div class="report-summary">
+                    <h3>Annual Summary</h3>
+                    <div id="yearly-summary"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <!-- Chart will be replaced with a table summary -->
+                </div>
+                
+                <div class="table-container">
+                    <table id="yearly-data-table">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Datacenter</th>
+                                <th>Total Usage (kWh)</th>
+                                <th>Primary Circuit (kWh)</th>
+                                <th>Redundant Circuit (kWh)</th>
+                                <th>Average Daily Usage (kWh)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="yearly-data"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Export/Import View -->
+        <section id="export-view" class="view">
+            <h2>Export/Import Data</h2>
+            
+            <div class="export-section">
+                <h3>Export Data</h3>
+                <div class="form-group">
+                    <label for="export-datacenter">Datacenter:</label>
+                    <select id="export-datacenter">
+                        <option value="all">All Datacenters</option>
+                    </select>
+                </div>
+                <div class="export-buttons">
+                    <button id="export-csv">Export as CSV</button>
+                    <button id="export-json">Export as JSON</button>
+                </div>
+            </div>
+            
+            <div class="import-section">
+                <h3>Import Data</h3>
+                <div class="form-group">
+                    <label for="import-file">Select File:</label>
+                    <input type="file" id="import-file" accept=".csv,.json">
+                </div>
+                <button id="import-data">Import Data</button>
+            </div>
+            
+            <div id="import-status"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Datacenter Power Readings Manager</p>
+    </footer>
+
+    <div id="error-container" style="display:none; background-color:#f8d7da; color:#721c24; padding:15px; margin:10px; border-radius:5px;">
+        <h3>An error occurred</h3>
+        <p id="error-message"></p>
+        <button onclick="this.parentElement.style.display='none'">Close</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
